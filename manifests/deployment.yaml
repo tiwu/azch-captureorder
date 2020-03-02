@@ -44,10 +44,23 @@ spec:
               secretKeyRef:
                 name: mongodb
                 key: mongoUser
-          - name: MONGOPASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: mongodb
-                key: mongoPassword
           ports:
           - containerPort: 80
+          volumeMounts:
+          - name: mongosecret
+            mountPath: /kvmnt
+            readOnly: true
+        volumes:
+          - name: mongosecret
+            flexVolume:
+              driver: "azure/kv"
+              secretRef:
+                name: kvcreds
+              options:
+                usepodidentity: "false"
+                keyvaultname: twuy-aks-vault
+                keyvaultobjectnames: mongo-password # Name of Key Vault secret
+                keyvaultobjecttypes: secret
+                resourcegroup: twuy-aks-weu
+                subscriptionid: 4b197dc5-d690-41ca-8ad0-7940531674d3
+                tenantid: 61261dd3-b1cd-4a90-b352-f162f961cf2b
